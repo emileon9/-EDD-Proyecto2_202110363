@@ -48,6 +48,10 @@ class Myapp(tk.Frame):
         self.ventanaviajes2 = None
         self.ventanaviajes3 = None
         self.ventanareportes1 = None
+        self.ventanareportes2= None
+        self.ventanareportes3 = None
+        self.ventanareportes4 = None
+        self.ventanareportes5 = None
         self.create_menubar()
 
     def create_menubar(self):
@@ -100,10 +104,10 @@ class Myapp(tk.Frame):
 
     def add_reportes_items(self):
         self.reportes.add_command(label='top 5 viajes mas largos', command=self.reportes1_ventana)
-        self.reportes.add_command(label='top 5 viajes mas caros')
-        self.reportes.add_command(label='top 5 clientes con mayor cantidad de viajes')
-        self.reportes.add_command(label='top 5 vehiculos con mayor cantidad de viajes')
-        self.reportes.add_command(label='Ruta de un viaje')
+        self.reportes.add_command(label='top 5 viajes mas caros', command=self.reportes2_ventana)
+        self.reportes.add_command(label='top 5 clientes con mayor cantidad de viajes',command=self.reportes3_ventana)
+        self.reportes.add_command(label='top 5 vehiculos con mayor cantidad de viajes', command=self.reportes4_ventana)
+        self.reportes.add_command(label='Ruta de un viaje', command=self.reportes5_ventana)
 
 
 #------------------------------------------------------------------------------------------------------------------------------
@@ -276,7 +280,45 @@ class Myapp(tk.Frame):
         else:
             # Si la ventana ya existe, simplemente la mostramos
             self.ventanareportes1.deiconify()
+    
+    def reportes2_ventana(self):
+        if self.ventanareportes2 is None or not self.ventanareportes1.winfo_exists():
+            self.ventanareportes2 = tk.Toplevel(self.root)
+            self.ventanareportes2.title('Top 5 Viajes mas costosos')
+            self.ventanareportes2.geometry('400x500')
+            self.create_widgets_in_ventanareportes2()
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanareportes2.deiconify()
+    
+    def reportes3_ventana(self):
+        if self.ventanareportes3 is None or not self.ventanareportes1.winfo_exists():
+            self.ventanareportes3 = tk.Toplevel(self.root)
+            self.ventanareportes3.title('Top 5 Clientes con mas viajes')
+            self.ventanareportes3.geometry('400x500')
+            self.create_widgets_in_ventanareportes3()
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanareportes3.deiconify()
 
+    def reportes4_ventana(self):
+        if self.ventanareportes4 is None or not self.ventanareportes1.winfo_exists():
+            self.ventanareportes4 = tk.Toplevel(self.root)
+            self.ventanareportes4.title('Top 5 de vehículos con mayor cantidad de viajes.')
+            self.ventanareportes4.geometry('400x500')
+            self.create_widgets_in_ventanareportes4()
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanareportes4.deiconify()
+    def reportes5_ventana(self):
+        if self.ventanareportes5 is None or not self.ventanareportes1.winfo_exists():
+            self.ventanareportes5 = tk.Toplevel(self.root)
+            self.ventanareportes5.title('Ruta de un viaje')
+            self.ventanareportes5.geometry('400x500')
+            self.create_widgets_in_ventanareportes5()
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanareportes5.deiconify()
     #------------------------------------------------------------------------------------------------------------------------------
     
     #obtener los datos del cliente para agregarlo
@@ -696,13 +738,17 @@ class Myapp(tk.Frame):
         placa = self.placa_vehiculo.get()
         ruta_info = ady.obtener_ruta_corta(origen, destino)
 
+        precio = arbolb.obtener_precio(placa)
+        
+
         ruta, distancia = ruta_info
         cantidad_destinos = len(ruta) - 1 
+        total = precio * distancia
 
         ve_encontrado=arbolb.buscar_modificar(placa)
         cliente_encontrado=lcde.buscar_cliente(idcliente)
         if ve_encontrado and cliente_encontrado:
-            linked.insertar_linked(idviaje, origen, destino, fecha, hora, idcliente, placa, ruta,cantidad_destinos, distancia)
+            linked.insertar_linked(idviaje, origen, destino, fecha, hora, idcliente, placa, ruta,cantidad_destinos, distancia, total)
             #aqui incremento los contadores de viaje
             cliente_encontrado.contador+=1
             ve_encontrado.contador+=1
@@ -758,7 +804,9 @@ class Myapp(tk.Frame):
             self.tiempo_mos.config(state='disabled')
 
     def graficoviajes(self):
+        
         dot = linked.generar_dot_viajes()
+        print(dot)
         linked.renderizar(dot, "viajes")
 
         canvas = tk.Canvas(self.ventanaviajes3, width=700, height=700)  
@@ -860,10 +908,36 @@ class Myapp(tk.Frame):
     
     # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+    def rutaporid(self):
+        idviaje = self.buscarruta.get()
+        linked.mostrar_ruta_por_id(idviaje)
+        
     def create_widgets_in_ventanareportes1(self):
         
         tk.Button(self.ventanareportes1, text="Generar",command=linked.mostrar_top_5_viajes ).grid(row=7, column=1, padx=5, pady=20)
         tk.Button(self.ventanareportes1, text="Cancelar", command=self.ventanareportes1.withdraw).grid(row=7, column=2, padx=5, pady=20)
+
+    def create_widgets_in_ventanareportes2(self):
+        
+        tk.Button(self.ventanareportes2, text="Generar",command=linked.mostrar_top_5_viajes_costosos ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanareportes2, text="Cancelar", command=self.ventanareportes2.withdraw).grid(row=7, column=2, padx=5, pady=20)
+    
+    def create_widgets_in_ventanareportes3(self):
+        
+        tk.Button(self.ventanareportes3, text="Generar",command=lcde.mostrar_top_5_clientes ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanareportes3, text="Cancelar", command=self.ventanareportes3.withdraw).grid(row=7, column=2, padx=5, pady=20)
+    def create_widgets_in_ventanareportes4(self):
+        
+        tk.Button(self.ventanareportes4, text="Generar",command=arbolb.mostrar_top_5_vehiculos ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanareportes4, text="Cancelar", command=self.ventanareportes4.withdraw).grid(row=7, column=2, padx=5, pady=20)
+    def create_widgets_in_ventanareportes5(self):
+        
+        tk.Label(self.ventanareportes5, text="ID Viaje").grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        self.buscarruta= tk.Entry(self.ventanareportes5, width=30)
+        self.buscarruta.grid(row=0, column=1, padx=10, pady=10)
+
+        tk.Button(self.ventanareportes5, text="Generar",command=self.rutaporid ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanareportes5, text="Cancelar", command=self.ventanareportes5.withdraw).grid(row=7, column=2, padx=5, pady=20)
 
 # Configuración de la ventana principal
 root = tk.Tk()

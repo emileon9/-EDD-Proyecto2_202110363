@@ -1,3 +1,6 @@
+import tkinter as tk
+from tkinter import ttk
+
 class Vehiculos:
     def __init__(self, placa:str,marca: str, modelo: str, precio: float,contador=0):
         self.placa: str = placa;
@@ -286,6 +289,80 @@ class ArbolB:
             hijo.hijos.extend(hermano.hijos)
 
         nodo.hijos.pop(i + 1)
+    
+    def obtener_precio(self, placa):
+        vehiculo = self.buscar(self.root, placa)
+        if vehiculo is not None:
+            return vehiculo.precio
+        else:
+            print("Vehículo no encontrado")
+            return None
 
     def __str__(self):
         return f"{self.root}"
+
+    def top_5_vehiculos(self):
+        vehiculos = []
+
+        def recorrer_nodo(nodo):
+            for vehiculo in nodo.claves:
+                vehiculos.append(vehiculo)
+            for hijo in nodo.hijos:
+                recorrer_nodo(hijo)
+
+        recorrer_nodo(self.root)
+        vehiculos.sort(key=lambda x: x.contador, reverse=True)
+        return vehiculos[:5]  # Retornar los 5 vehículos con más viajes
+
+    def obtener_top_5_vehiculos(self):
+        top_vehiculos = self.top_5_vehiculos()
+        if not top_vehiculos:
+            return []
+        return [
+            (
+                vehiculo.placa,
+                vehiculo.marca,
+                vehiculo.modelo,
+                vehiculo.precio,
+                vehiculo.contador,
+            )
+            for vehiculo in top_vehiculos
+        ]
+
+    def mostrar_top_5_vehiculos(self):
+        # Crear ventana de Tkinter
+        ventana = tk.Tk()
+        ventana.title("Top 5 Vehículos con Más Viajes")
+        ventana.geometry("800x400")
+
+        # Crear tabla usando Treeview
+        tree = ttk.Treeview(
+            ventana,
+            columns=("Placa", "Marca", "Modelo", "Precio", "Viajes"),
+            show="headings"
+        )
+        tree.heading("Placa", text="Placa")
+        tree.heading("Marca", text="Marca")
+        tree.heading("Modelo", text="Modelo")
+        tree.heading("Precio", text="Precio")
+        tree.heading("Viajes", text="Viajes")
+
+        tree.column("Placa", anchor="center", width=120)
+        tree.column("Marca", anchor="center", width=100)
+        tree.column("Modelo", anchor="center", width=100)
+        tree.column("Precio", anchor="center", width=100)
+        tree.column("Viajes", anchor="center", width=80)
+
+        # Obtener el top 5 de vehículos con más viajes
+        top_vehiculos = self.obtener_top_5_vehiculos()
+        for vehiculo in top_vehiculos:
+            tree.insert("", "end", values=vehiculo)
+
+        tree.pack(fill="both", expand=True)
+
+        # Botón para cerrar la ventana
+        btn_cerrar = tk.Button(ventana, text="Cerrar", command=ventana.destroy)
+        btn_cerrar.pack(pady=10)
+
+        # Mostrar la ventana
+        ventana.mainloop()

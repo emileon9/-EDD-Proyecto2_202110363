@@ -1,3 +1,5 @@
+import tkinter as tk
+
 class Rutas:
     def __init__(self, origen, destino, tiempo):
         self.origen = origen
@@ -166,6 +168,44 @@ class ListaAdyacencia:
             return None
 
         return camino, distancias[destino]
+    
+    def mostrar_ruta_en_tabla(self, ruta):
+        if not ruta:
+            print("No hay datos para mostrar.")
+            return
+
+        # Crear ventana de Tkinter
+        ventana = tk.Tk()
+        ventana.title("Detalles de la Ruta")
+        ventana.geometry("600x400")
+
+        # Crear tabla usando Treeview
+        tree = ttk.Treeview(
+            ventana,
+            columns=("Origen", "Destino", "Tiempo"),
+            show="headings"
+        )
+        tree.heading("Origen", text="Origen")
+        tree.heading("Destino", text="Destino")
+        tree.heading("Tiempo", text="Tiempo (min)")
+
+        tree.column("Origen", anchor="center", width=150)
+        tree.column("Destino", anchor="center", width=150)
+        tree.column("Tiempo", anchor="center", width=100)
+
+        # Insertar los datos de la ruta en la tabla
+        for segmento in ruta:
+            tree.insert("", "end", values=segmento)
+
+        tree.pack(fill="both", expand=True)
+
+        # Botón para cerrar la ventana
+        btn_cerrar = tk.Button(ventana, text="Cerrar", command=ventana.destroy)
+        btn_cerrar.pack(pady=10)
+
+        # Mostrar la ventana
+        ventana.mainloop()
+
 
 
 

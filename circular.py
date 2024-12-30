@@ -1,5 +1,7 @@
 from graphviz import Digraph
 from tkinter import PhotoImage
+from tkinter import ttk
+import tkinter as tk
 
 
 class Nodocircular:
@@ -156,4 +158,81 @@ class listacirculardoble:
             print("Gráfico generado correctamente")
         except Exception as e:
             print(f"Error al generar el gráfico: {e}")
+    
+    def top_5_clientes(self):
+        if self.primero is None:
+            print("No hay clientes para mostrar.")
+            return None
+        else:
+            actual = self.primero
+            lista = []
+            while True:
+                lista.append(actual)
+                actual = actual.siguiente
+                if actual == self.primero:
+                    break
+            # Ordenar por el contador de viajes en orden descendente
+            lista.sort(key=lambda x: x.contador, reverse=True)
+            return lista[:5]  # Retornar los 5 clientes con más viajes
+
+    def obtener_top_5_clientes(self):
+        top_clientes = self.top_5_clientes()
+        if not top_clientes:
+            return []
+        return [
+            (
+                cliente.dpi,
+                cliente.nombre,
+                cliente.apellido,
+                cliente.genero,
+                cliente.telefono,
+                cliente.direccion,
+                cliente.contador,
+            )
+            for cliente in top_clientes
+        ]
+
+    def mostrar_top_5_clientes(self):
+        # Crear ventana de Tkinter
+        ventana = tk.Tk()
+        ventana.title("Top 5 Clientes con Más Viajes")
+        ventana.geometry("800x400")
+
+        # Crear tabla usando Treeview
+        tree = ttk.Treeview(
+            ventana,
+            columns=("DPI", "Nombre", "Apellido", "Género", "Teléfono", "Dirección", "Viajes"),
+            show="headings"
+        )
+        tree.heading("DPI", text="DPI")
+        tree.heading("Nombre", text="Nombre")
+        tree.heading("Apellido", text="Apellido")
+        tree.heading("Género", text="Género")
+        tree.heading("Teléfono", text="Teléfono")
+        tree.heading("Dirección", text="Dirección")
+        tree.heading("Viajes", text="Viajes")
+
+        tree.column("DPI", anchor="center", width=120)
+        tree.column("Nombre", anchor="center", width=100)
+        tree.column("Apellido", anchor="center", width=100)
+        tree.column("Género", anchor="center", width=80)
+        tree.column("Teléfono", anchor="center", width=120)
+        tree.column("Dirección", anchor="center", width=150)
+        tree.column("Viajes", anchor="center", width=80)
+
+        # Obtener el top 5 de clientes con más viajes
+        top_clientes = self.obtener_top_5_clientes()
+        for cliente in top_clientes:
+            tree.insert("", "end", values=cliente)
+
+        tree.pack(fill="both", expand=True)
+
+        # Botón para cerrar la ventana
+        btn_cerrar = tk.Button(ventana, text="Cerrar", command=ventana.destroy)
+        btn_cerrar.pack(pady=10)
+
+        # Mostrar la ventana
+        ventana.mainloop()
+
+
 
