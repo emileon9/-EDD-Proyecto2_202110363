@@ -1,0 +1,29 @@
+digraph G {
+	bgcolor="white";
+	rankdir=LR;
+	edge [arrowhead=none fontcolor=black color="#8e44ad"];
+	node [shape=circle fixedsize=shape width=0.5 fontsize=7 style=filled fillcolor="#85c1e9" fontcolor=white color=transparent];
+	Cadiz -> Sevilla [fontsize=7, headlabel="125",taillabel="125", labeldistance=1.5];
+	Sevilla -> Granada [fontsize=7, headlabel="256",taillabel="256", labeldistance=1.5];
+	Sevilla -> Jaen [fontsize=7, headlabel="242",taillabel="242", labeldistance=1.5];
+	Granada -> Jaen [fontsize=7, headlabel="99",taillabel="99", labeldistance=1.5];
+	Granada -> Murcia [fontsize=7, headlabel="278",taillabel="278", labeldistance=1.5];
+	Jaen -> Madrid [fontsize=7, headlabel="335",taillabel="335", labeldistance=1.5];
+	Murcia -> Valencia [fontsize=7, headlabel="241",taillabel="241", labeldistance=1.5];
+	Murcia -> Albacete [fontsize=7, headlabel="150",taillabel="150", labeldistance=1.5];
+	Madrid -> Albacete [fontsize=7, headlabel="251",taillabel="251", labeldistance=1.5];
+	Madrid -> Zaragoza [fontsize=7, headlabel="325",taillabel="325", labeldistance=1.5];
+	Madrid -> Badajoz [fontsize=7, headlabel="403",taillabel="403", labeldistance=1.5];
+	Madrid -> Valladolid [fontsize=7, headlabel="193",taillabel="193", labeldistance=1.5];
+	Madrid -> Bilbao [fontsize=7, headlabel="395",taillabel="395", labeldistance=1.5];
+	Valencia -> Albacete [fontsize=7, headlabel="191",taillabel="191", labeldistance=1.5];
+	Valencia -> Barcelona [fontsize=7, headlabel="349",taillabel="349", labeldistance=1.5];
+	Barcelona -> Gerona [fontsize=7, headlabel="100",taillabel="100", labeldistance=1.5];
+	Barcelona -> Zaragoza [fontsize=7, headlabel="296",taillabel="296", labeldistance=1.5];
+	Zaragoza -> Bilbao [fontsize=7, headlabel="324",taillabel="324", labeldistance=1.5];
+	Valladolid -> Vigo [fontsize=7, headlabel="356",taillabel="356", labeldistance=1.5];
+	Valladolid -> Coruna [fontsize=7, headlabel="455",taillabel="455", labeldistance=1.5];
+	Valladolid -> Bilbao [fontsize=7, headlabel="280",taillabel="280", labeldistance=1.5];
+	Vigo -> Coruna [fontsize=7, headlabel="171",taillabel="171", labeldistance=1.5];
+	Bilbao -> Oviedo [fontsize=7, headlabel="304",taillabel="304", labeldistance=1.5];
+	}
