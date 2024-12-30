@@ -79,7 +79,6 @@ class ListaAdyacencia:
         dot += "}"
         return dot
 
-    #renderizar el archivo dot y generar la imagen
     def renderizar(self, dot: str, nombre: str):
         from graphviz import Source
         Source(dot).render(nombre, format="png", cleanup=True)
@@ -97,7 +96,7 @@ class ListaAdyacencia:
                                 destino = subpartes[1].strip()
                                 tiempo = int(subpartes[2].strip())
 
-                                # Insertar las rutas en ambas direcciones
+                            
                                 self.insertar(origen, destino, tiempo)
                                 self.insertar(destino, origen, tiempo)
 
@@ -113,12 +112,12 @@ class ListaAdyacencia:
             print("No hay rutas para buscar.")
             return None
 
-        # Inicializar estructuras para el algoritmo de Dijkstra
+      
         distancias = {}
         predecesores = {}
         visitados = set()
 
-        # Inicializar las distancias a infinito y predecesores a None
+        # Inicializar las distancias 
         aux = self.vertices.cabeza
         while aux is not None:
             vertice = aux.valor
@@ -143,7 +142,7 @@ class ListaAdyacencia:
 
             visitados.add(actual)
 
-            # Relajar las aristas del nodo actual
+           
             vertice_actual = self.vertices.buscar(actual)
             if vertice_actual is not None:
                 arista_aux = vertice_actual.valor.vecinos.cabeza

@@ -3,13 +3,14 @@ from tkinter import PhotoImage
 
 
 class Nodocircular:
-    def __init__(self, dpi, nombre, apellido, genero, telefono, direccion):
+    def __init__(self, dpi, nombre, apellido, genero, telefono, direccion, contador=0):
         self.dpi = dpi
         self.nombre = nombre
         self.apellido = apellido
         self.genero = genero
         self.telefono = telefono
         self.direccion = direccion
+        self.contador = contador
         self.siguiente = None
         self.anterior = None
 

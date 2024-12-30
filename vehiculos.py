@@ -1,9 +1,10 @@
 class Vehiculos:
-    def __init__(self, placa:str,marca: str, modelo: str, precio: float):
+    def __init__(self, placa:str,marca: str, modelo: str, precio: float,contador=0):
         self.placa: str = placa;
         self.marca: str = marca;
         self.modelo: str = modelo;
         self.precio: float = precio;
+        self.contador = contador
         
     def __str__(self):
         return f"Marca: {self.marca} - Modelo: {self.modelo} - Precio: {self.precio} - Placa: {self.placa}";

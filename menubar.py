@@ -92,7 +92,7 @@ class Myapp(tk.Frame):
     def add_viajes_items(self):
         self.viajes.add_command(label='Agregar Viaje', command=self.agregarviaje_ventana)
         self.viajes.add_command(label='Mostrar Viaje', command=self.mostrarviaje_ventana)
-        self.viajes.add_command(label='Generar grafico')
+        self.viajes.add_command(label='Generar grafico', command=self.graficarviaje_ventana)
 
 #------------------------------------------------------------------------------------------------------------------------------
 
@@ -242,6 +242,17 @@ class Myapp(tk.Frame):
         else:
             # Si la ventana ya existe, simplemente la mostramos
             self.ventanaviajes2.deiconify()
+    
+    def graficarviaje_ventana(self):
+        if self.ventanaviajes3 is None or not self.ventanaviajes3.winfo_exists():
+            # Crear la ventana secundaria si no existe
+            self.ventanaviajes3 = tk.Toplevel(self.root)
+            self.ventanaviajes3.title('Grafico Viajes')
+            self.create_widgets_in_ventanaviajesgrafico()
+            self.ventanaviajes3.geometry('700x700')
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanaviajes3.deiconify()
     #------------------------------------------------------------------------------------------------------------------------------
     
     #obtener los datos del cliente para agregarlo
@@ -613,6 +624,26 @@ class Myapp(tk.Frame):
         dot = ady.imprimir()
         ady.renderizar(dot, "rutas")
 
+        canvas = tk.Canvas(self.ventanarutas2, width=700, height=700)  
+        canvas.grid(row=1, column=0, columnspan=3, sticky="nsew")  
+
+        # Cargar la imagen
+        try:
+            img = tk.PhotoImage(file="rutas.png")
+            canvas.create_image(0, 0, anchor=tk.NW, image=img)
+            canvas.image = img 
+        except Exception as e:
+            print(f"Error al cargar la imagen: {e}")
+
+        scrollbar_vertical = tk.Scrollbar(self.ventanarutas2, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar_vertical.grid(row=1, column=3, sticky="ns")
+
+        scrollbar_horizontal = tk.Scrollbar(self.ventanarutas2, orient=tk.HORIZONTAL, command=canvas.xview)
+        scrollbar_horizontal.grid(row=2, column=0, columnspan=3, sticky="ew")
+
+        canvas.config(yscrollcommand=scrollbar_vertical.set, xscrollcommand=scrollbar_horizontal.set)
+        canvas.config(scrollregion=canvas.bbox("all"))
+
     def create_widgets_in_ventanarutas(self):
 
         tk.Label(self.ventanarutas, text="Ruta del archivo").grid(row=2, column=0, padx=10, pady=10, sticky="w")
@@ -630,7 +661,7 @@ class Myapp(tk.Frame):
 
 #------------------------------------------------------------------------------------------------------------------------------
 
-    def prueba_rutas(self):
+    def crear_viaje(self):
 
         idviaje = self.id_viaje.get()
         origen = self.origen.get()
@@ -640,11 +671,18 @@ class Myapp(tk.Frame):
         idcliente = self.id_cliente.get()
         placa = self.placa_vehiculo.get()
         ruta = ady.obtener_ruta_corta(origen, destino)
-        vehiculo_encontrado=arbolb.buscar_modificar(placa)
+        ve_encontrado=arbolb.buscar_modificar(placa)
         cliente_encontrado=lcde.buscar_cliente(idcliente)
-        if vehiculo_encontrado and cliente_encontrado:
+        if ve_encontrado and cliente_encontrado:
             linked.insertar_linked(idviaje, origen, destino, fecha, hora, idcliente, placa, ruta)
-            print("Viaje creado")
+
+            #aqui incremento los contadores de viaje
+            cliente_encontrado.contador+=1
+            ve_encontrado.contador+=1
+            
+            print(f"Cliente {cliente_encontrado.nombre} ahora tiene {cliente_encontrado.contador} viajes.")
+            print(f"Vehículo con placa {ve_encontrado.placa} ahora tiene {ve_encontrado.contador} viajes.")
+
         else:
             print("No se pudo crear el viaje")
         
@@ -682,7 +720,36 @@ class Myapp(tk.Frame):
             self.placa_mos.delete(0, tk.END)
             self.placa_mos.insert(0, viaje.vehiculo)
             self.placa_mos.config(state='disabled')
-       
+            self.ruta_mos.config(state='normal')
+            self.ruta_mos.delete(0, tk.END)
+            self.ruta_mos.insert(0, viaje.ruta)
+            self.ruta_mos.config(state='disabled')
+
+    def graficoviajes(self):
+        dot = linked.generar_dot_viajes()
+        linked.renderizar(dot, "viajes")
+
+        canvas = tk.Canvas(self.ventanaviajes3, width=700, height=700)  
+        canvas.grid(row=1, column=0, columnspan=3, sticky="nsew")  
+
+        # Cargar la imagen
+        try:
+            img = tk.PhotoImage(file="viajes.png")
+            canvas.create_image(0, 0, anchor=tk.NW, image=img)
+            canvas.image = img 
+        except Exception as e:
+            print(f"Error al cargar la imagen: {e}")
+
+        scrollbar_vertical = tk.Scrollbar(self.ventanaviajes3, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar_vertical.grid(row=1, column=3, sticky="ns")
+
+        scrollbar_horizontal = tk.Scrollbar(self.ventanaviajes3, orient=tk.HORIZONTAL, command=canvas.xview)
+        scrollbar_horizontal.grid(row=2, column=0, columnspan=3, sticky="ew")
+
+        canvas.config(yscrollcommand=scrollbar_vertical.set, xscrollcommand=scrollbar_horizontal.set)
+        canvas.config(scrollregion=canvas.bbox("all"))
+        
+
 
     def create_widgets_in_ventanaviajes(self):
         # Etiquetas (Labels)
@@ -711,7 +778,7 @@ class Myapp(tk.Frame):
         self.placa_vehiculo.grid(row=6, column=1, padx=10, pady=10)
 
         # Botones
-        tk.Button(self.ventanaviajes1, text="Crear", command=self.prueba_rutas).grid(row=10, column=0, padx=5, pady=20)
+        tk.Button(self.ventanaviajes1, text="Crear", command=self.crear_viaje).grid(row=10, column=0, padx=5, pady=20)
         tk.Button(self.ventanaviajes1, text="Cancelar", command=self.ventanaviajes1.withdraw).grid(row=10, column=2, padx=5, pady=20)
     
     def create_widgets_in_ventanaviajesmostrar(self):
@@ -723,6 +790,7 @@ class Myapp(tk.Frame):
         tk.Label(self.ventanaviajes2, text="Hora").grid(row=5, column=0, padx=10, pady=10, sticky="w")
         tk.Label(self.ventanaviajes2, text="ID Cliente").grid(row=6, column=0, padx=10, pady=10, sticky="w")
         tk.Label(self.ventanaviajes2, text="Placa Vehiculo").grid(row=7, column=0, padx=10, pady=10, sticky="w")
+        tk.Label(self.ventanaviajes2, text="Ruta Corta").grid(row=8, column=0, padx=10, pady=10, sticky="w")
 
 
         # Cajas de texto (Entry)
@@ -742,10 +810,17 @@ class Myapp(tk.Frame):
         self.idcliente_mos.grid(row=6, column=1, padx=10, pady=10)
         self.placa_mos = tk.Entry(self.ventanaviajes2, width=30)
         self.placa_mos.grid(row=7, column=1, padx=10, pady=10)
+        self.ruta_mos = tk.Entry(self.ventanaviajes2, width=30)
+        self.ruta_mos.grid(row=8, column=1, padx=10, pady=10)
 
         # Botones
         tk.Button(self.ventanaviajes2, text="Mostrar", command=self.mostrar_viaje ).grid(row=10, column=1, padx=5, pady=20)
         tk.Button(self.ventanaviajes2, text="Cancelar", command=self.ventanaviajes2.withdraw).grid(row=10, column=2, padx=5, pady=20)
+    
+    def create_widgets_in_ventanaviajesgrafico(self):
+        
+        tk.Button(self.ventanaviajes3, text="Generar", command=self.graficoviajes ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanaviajes3, text="Cancelar", command=self.ventanaviajes3.withdraw).grid(row=7, column=2, padx=5, pady=20)
         
     
 
