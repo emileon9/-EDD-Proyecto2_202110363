@@ -47,6 +47,7 @@ class Myapp(tk.Frame):
         self.ventanaviajes1 = None
         self.ventanaviajes2 = None
         self.ventanaviajes3 = None
+        self.ventanareportes1 = None
         self.create_menubar()
 
     def create_menubar(self):
@@ -57,16 +58,19 @@ class Myapp(tk.Frame):
         self.viajes = tk.Menu(self.menubar)
         self.rutas = tk.Menu(self.menubar)
         self.vehiculos = tk.Menu(self.menubar)
+        self.reportes = tk.Menu(self.menubar)
 
         self.menubar.add_cascade(label='Clientes', menu=self.clientes)
         self.menubar.add_cascade(label='Viajes', menu=self.viajes)
         self.menubar.add_cascade(label='Rutas', menu=self.rutas)
         self.menubar.add_cascade(label='Vehiculos', menu=self.vehiculos)
+        self.menubar.add_cascade(label='Reportes', menu=self.reportes)
 
         self.add_clientes_items()
         self.add_vehiculos_items()
         self.add_rutas_items()
         self.add_viajes_items()
+        self.add_reportes_items()
 
     #aqui esta todo lo de clientes --------------------------------------------------------------------------------------------------
     #sub lista en el menu de clientes
@@ -93,6 +97,14 @@ class Myapp(tk.Frame):
         self.viajes.add_command(label='Agregar Viaje', command=self.agregarviaje_ventana)
         self.viajes.add_command(label='Mostrar Viaje', command=self.mostrarviaje_ventana)
         self.viajes.add_command(label='Generar grafico', command=self.graficarviaje_ventana)
+
+    def add_reportes_items(self):
+        self.reportes.add_command(label='top 5 viajes mas largos', command=self.reportes1_ventana)
+        self.reportes.add_command(label='top 5 viajes mas caros')
+        self.reportes.add_command(label='top 5 clientes con mayor cantidad de viajes')
+        self.reportes.add_command(label='top 5 vehiculos con mayor cantidad de viajes')
+        self.reportes.add_command(label='Ruta de un viaje')
+
 
 #------------------------------------------------------------------------------------------------------------------------------
 
@@ -253,6 +265,18 @@ class Myapp(tk.Frame):
         else:
             # Si la ventana ya existe, simplemente la mostramos
             self.ventanaviajes3.deiconify()
+    #------------------------------------------------------------------------------------------------------------------------------
+
+    def reportes1_ventana(self):
+        if self.ventanareportes1 is None or not self.ventanareportes1.winfo_exists():
+            self.ventanareportes1 = tk.Toplevel(self.root)
+            self.ventanareportes1.title('Top 5 Viajes mas largos')
+            self.ventanareportes1.geometry('400x500')
+            self.create_widgets_in_ventanareportes1()
+        else:
+            # Si la ventana ya existe, simplemente la mostramos
+            self.ventanareportes1.deiconify()
+
     #------------------------------------------------------------------------------------------------------------------------------
     
     #obtener los datos del cliente para agregarlo
@@ -670,16 +694,20 @@ class Myapp(tk.Frame):
         hora = self.hora.get()
         idcliente = self.id_cliente.get()
         placa = self.placa_vehiculo.get()
-        ruta = ady.obtener_ruta_corta(origen, destino)
+        ruta_info = ady.obtener_ruta_corta(origen, destino)
+
+        ruta, distancia = ruta_info
+        cantidad_destinos = len(ruta) - 1 
+
         ve_encontrado=arbolb.buscar_modificar(placa)
         cliente_encontrado=lcde.buscar_cliente(idcliente)
         if ve_encontrado and cliente_encontrado:
-            linked.insertar_linked(idviaje, origen, destino, fecha, hora, idcliente, placa, ruta)
-
+            linked.insertar_linked(idviaje, origen, destino, fecha, hora, idcliente, placa, ruta,cantidad_destinos, distancia)
             #aqui incremento los contadores de viaje
             cliente_encontrado.contador+=1
             ve_encontrado.contador+=1
-            
+            print(f"Viaje creado correctamente con {cantidad_destinos} destinos en la ruta. con tiempo de {distancia}")
+
             print(f"Cliente {cliente_encontrado.nombre} ahora tiene {cliente_encontrado.contador} viajes.")
             print(f"Vehículo con placa {ve_encontrado.placa} ahora tiene {ve_encontrado.contador} viajes.")
 
@@ -724,6 +752,10 @@ class Myapp(tk.Frame):
             self.ruta_mos.delete(0, tk.END)
             self.ruta_mos.insert(0, viaje.ruta)
             self.ruta_mos.config(state='disabled')
+            self.tiempo_mos.config(state='normal')
+            self.tiempo_mos.delete(0, tk.END)
+            self.tiempo_mos.insert(0, viaje.tiempo)
+            self.tiempo_mos.config(state='disabled')
 
     def graficoviajes(self):
         dot = linked.generar_dot_viajes()
@@ -791,6 +823,7 @@ class Myapp(tk.Frame):
         tk.Label(self.ventanaviajes2, text="ID Cliente").grid(row=6, column=0, padx=10, pady=10, sticky="w")
         tk.Label(self.ventanaviajes2, text="Placa Vehiculo").grid(row=7, column=0, padx=10, pady=10, sticky="w")
         tk.Label(self.ventanaviajes2, text="Ruta Corta").grid(row=8, column=0, padx=10, pady=10, sticky="w")
+        tk.Label(self.ventanaviajes2, text="Tiempo").grid(row=9, column=0, padx=10, pady=10, sticky="w")
 
 
         # Cajas de texto (Entry)
@@ -812,6 +845,8 @@ class Myapp(tk.Frame):
         self.placa_mos.grid(row=7, column=1, padx=10, pady=10)
         self.ruta_mos = tk.Entry(self.ventanaviajes2, width=30)
         self.ruta_mos.grid(row=8, column=1, padx=10, pady=10)
+        self.tiempo_mos = tk.Entry(self.ventanaviajes2, width=30)
+        self.tiempo_mos.grid(row=9, column=1, padx=10, pady=10)
 
         # Botones
         tk.Button(self.ventanaviajes2, text="Mostrar", command=self.mostrar_viaje ).grid(row=10, column=1, padx=5, pady=20)
@@ -823,7 +858,12 @@ class Myapp(tk.Frame):
         tk.Button(self.ventanaviajes3, text="Cancelar", command=self.ventanaviajes3.withdraw).grid(row=7, column=2, padx=5, pady=20)
         
     
+    # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+    def create_widgets_in_ventanareportes1(self):
+        
+        tk.Button(self.ventanareportes1, text="Generar",command=linked.mostrar_top_5_viajes ).grid(row=7, column=1, padx=5, pady=20)
+        tk.Button(self.ventanareportes1, text="Cancelar", command=self.ventanareportes1.withdraw).grid(row=7, column=2, padx=5, pady=20)
 
 # Configuración de la ventana principal
 root = tk.Tk()
